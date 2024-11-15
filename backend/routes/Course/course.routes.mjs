@@ -3,6 +3,7 @@ import upload from "../../middleware/fileUpload.mjs";
 import {
   addCourse,
   addModule,
+  addSubmodule,
   getActivityData,
   getAllCourses,
   getCountsModuleAndEnrollment,
@@ -14,6 +15,7 @@ import {
   getOtherModules,
   getSingleCourse,
   getStructuredData,
+  getSubmodulesByCourseAndModule,
   submitCourseContent,
   updateCourseById,
   updateModule,
@@ -32,6 +34,7 @@ router.put(
   updateCourseById
 );
 router.get("/getcourse/:id", getSingleCourse);
+
 // Module Section
 router.get("/getmodule", getModule);
 router.put("/updatemodule", upload.single("moduleImage"), updateModule); // update the module name
@@ -46,5 +49,9 @@ router.get("/structured-data", getStructuredData);
 router.get("/activity/:course_id/:module_id", getActivityData);
 router.get("/:course/:module", getOtherModules);
 router.get("/moduleandenrollcount", getCountsModuleAndEnrollment);
+
+// Sub Module
+router.post("/addsubmodule",addSubmodule)
+router.get('/submodules/:courseid/:moduleid', getSubmodulesByCourseAndModule);
 
 export default router;

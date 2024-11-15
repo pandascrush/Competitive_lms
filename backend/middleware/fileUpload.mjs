@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from 'fs'
 
 // Get __dirname equivalent for ES6 modules
 const __filename = fileURLToPath(import.meta.url);
@@ -24,16 +25,23 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|mp4|avi|mov|mkv|webm/;
-    const extName = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimeType = allowedTypes.test(file.mimetype);
+    const allowedExtensions = /jpeg|jpg|png|gif|pdf|mp4|avi|mov|mkv|webm|csv|xlsx|xls/;
+    const extName = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+
+    const allowedMimeTypes = [
+      'image/jpeg', 'image/png', 'image/gif',
+      'application/pdf',
+      'video/mp4', 'video/avi', 'video/quicktime', 'video/x-matroska', 'video/webm',
+      'text/csv',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel' // .xls
+    ];
+    const mimeType = allowedMimeTypes.includes(file.mimetype);
 
     if (mimeType && extName) {
-      return cb(null, true);
+      cb(null, true);
     } else {
-      cb(new Error("Only images and PDFs are allowed."));
+      cb(new Error("Only images, PDFs, videos, CSV, and Excel files are allowed."));
     }
   },
 });

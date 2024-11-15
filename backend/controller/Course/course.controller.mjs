@@ -1200,3 +1200,174 @@ export const getCountsModuleAndEnrollment = (req, res) => {
     });
   });
 };
+
+/*                                Sub Module                                         */
+
+export const addSubmodule = (req, res) => {
+  const { courseid, moduleid, submodulename } = req.body;
+
+  if (!courseid || !moduleid || !submodulename) {
+    return res
+      .status(400)
+      .json({
+        error: "Course ID, Module ID, and Submodule Name are required.",
+      });
+  }
+
+  // Step 1: Fetch course_category_id from the courses table based on courseid
+  const getCourseCategoryIdQuery = `
+      SELECT course_category_id FROM courses WHERE courseid = ?
+  `;
+  db.query(getCourseCategoryIdQuery, [courseid], (courseErr, courseResult) => {
+    if (courseErr) {
+      console.error("Error fetching course category ID:", courseErr);
+      return res.status(500).json({ error: "Error fetching course data." });
+    }
+
+    if (courseResult.length === 0) {
+      return res.status(404).json({ error: "Course not found." });
+    }
+
+    const course_category_id = courseResult[0].course_category_id;
+
+    // Step 2: Insert into the `submodule` table
+    const submoduleQuery = `
+          INSERT INTO submodule (submodulename, courseid, moduleid, timestamp)
+          VALUES (?, ?, ?, NOW())
+      `;
+    const submoduleValues = [submodulename, courseid, moduleid];
+
+    db.query(
+      submoduleQuery,
+      submoduleValues,
+      (submoduleErr, submoduleResult) => {
+        if (submoduleErr) {
+          console.error("Error inserting into submodule table:", submoduleErr);
+          return res
+            .status(500)
+            .json({ error: "Error saving submodule data." });
+        }
+
+        const submoduleid = submoduleResult.insertId;
+
+        // Step 3: Check if the courseid and moduleid already exist in the context table
+        const checkContextQuery = `
+              SELECT * FROM context
+              WHERE contextlevel = 8 
+              AND path = ?
+          `;
+        const contextPath = `${course_category_id}/${courseid}/${moduleid}`;
+
+        db.query(
+          checkContextQuery,
+          [contextPath],
+          (contextErr, contextResult) => {
+            if (contextErr) {
+              console.error("Error checking context table:", contextErr);
+              return res
+                .status(500)
+                .json({ error: "Error checking context data." });
+            }
+
+            // Step 4: Find the highest depth value
+            let maxDepth = 0;
+
+            // Check all context records for this path
+            contextResult.forEach((record) => {
+              const depthParts = record.depth.split("/");
+              const depthValue = parseInt(depthParts[1], 10); // Get the number after the "/"
+              if (depthValue > maxDepth) {
+                maxDepth = depthValue;
+              }
+            });
+
+            // Increment the depth by 1
+            const newDepth = `0/${maxDepth + 1}`;
+
+            // Insert the new context record with the incremented depth
+            const contextQuery = `
+                  INSERT INTO context (contextlevel, instanceid, path, depth)
+                  VALUES (?, ?, ?, ?)
+              `;
+            const contextValues = [8, submoduleid, contextPath, newDepth];
+
+            db.query(
+              contextQuery,
+              contextValues,
+              (contextErr, contextResult) => {
+                if (contextErr) {
+                  console.error(
+                    "Error inserting into context table:",
+                    contextErr
+                  );
+                  return res
+                    .status(500)
+                    .json({ error: "Error saving context data." });
+                }
+
+                // Step 5: Update the submodule table with the context_id
+                const updateSubmoduleQuery = `
+                      UPDATE submodule
+                      SET context_id = ?
+                      WHERE submodule_id = ?
+                  `;
+                db.query(
+                  updateSubmoduleQuery,
+                  [contextResult.insertId, submoduleid],
+                  (updateErr) => {
+                    if (updateErr) {
+                      console.error(
+                        "Error updating submodule table:",
+                        updateErr
+                      );
+                      return res
+                        .status(500)
+                        .json({ error: "Error updating submodule data." });
+                    }
+
+                    return res.status(201).json({
+                      message: "Submodule added successfully!",
+                      submodule_id: submoduleid,
+                      context_id: contextResult.insertId,
+                    });
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+};
+
+export const getSubmodulesByCourseAndModule = (req, res) => {
+  const { courseid, moduleid } = req.params; // Assuming you're passing courseid and moduleid as URL parameters
+
+  if (!courseid || !moduleid) {
+      return res.status(400).json({ error: 'Course ID and Module ID are required.' });
+  }
+
+  // SQL query to fetch submodules based on courseid and moduleid
+  const query = `
+      SELECT * FROM submodule
+      WHERE courseid = ? AND moduleid = ?
+  `;
+
+  db.query(query, [courseid, moduleid], (err, results) => {
+      if (err) {
+          console.error("Error fetching submodules:", err);
+          return res.status(500).json({ error: 'Error fetching submodules data.' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ message: 'No submodules found for the specified course and module.' });
+      }
+
+      return res.status(200).json({
+          message: 'Submodules fetched successfully!',
+          results
+      });
+  });
+};
+

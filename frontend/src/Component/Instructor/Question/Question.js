@@ -9,6 +9,8 @@ import { FaPlus, FaUpload } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 
 const Question = () => {
   const [content, setContent] = useState("");
@@ -34,20 +36,102 @@ const Question = () => {
   const editorRef = useRef(null);
   const [correctOptions, setCorrectOptions] = useState([]);
 
+  const [courses, setCourses] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [submodules, setSubmodules] = useState([]);
+  const [courseid, setCourseId] = useState(0);
+  const [moduleid, setModuleId] = useState(0);
+  const [submoduleid, setSubmoduleid] = useState(0);
+
   const { id } = useParams();
 
   useEffect(() => {
+    // Fetch all courses on component mount
     axios
-      .get(`${process.env.REACT_APP_API_URL}course/structured-data`)
+      .get(`${process.env.REACT_APP_API_URL}course/getcourse`)
       .then((res) => {
-        console.log(res.data);
-        setModuleStructure(res.data); // Set the fetched data to state
+        setCourses(res.data.result);
       })
       .catch((error) => {
+        toast.error("Failed to fetch courses!");
         console.error(error);
-        alert("Failed to fetch courses!"); // Or use a toast if you prefer
       });
   }, []);
+
+  useEffect(() => {
+    if (courseid !== 0) {
+      // Fetch modules based on selected course ID
+      axios
+        .get(`${process.env.REACT_APP_API_URL}course/getmodules/${courseid}`)
+        .then((res) => {
+          setModules(res.data);
+        })
+        .catch((error) => {
+          toast.error("Failed to fetch modules!");
+          console.error(error);
+        });
+    } else {
+      setModules([]); // Clear modules if no course is selected
+    }
+  }, [courseid]);
+
+  useEffect(() => {
+    if (courseid !== 0) {
+      // Fetch modules based on selected course ID
+      axios
+        .get(
+          `${process.env.REACT_APP_API_URL}course/submodules/${courseid}/${moduleid}`
+        )
+        .then((res) => {
+          // console.log(res.data);
+          setSubmodules(res.data.results);
+        })
+        .catch((error) => {
+          toast.error("Failed to fetch modules!");
+          console.error(error);
+        });
+    } else {
+      setSubmodules([]); // Clear modules if no course is selected
+    }
+  }, [moduleid]);
+
+  const handleFileDownload = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}quiz/download-sample`, {
+        responseType: "blob", // Ensure the response is treated as a file
+      })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "Sample_Question_Format.csv"); // Set the file name
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
+  };
+
+  const handleCourseChange = (event) => {
+    setCourseId(event.target.value);
+    setModuleId(0); // Reset selected module when course changes
+  };
+
+  const handleModuleChange = (event) => {
+    setModuleId(event.target.value);
+  };
+
+  const handleSubmoduleChange = (e) => {
+    setSubmoduleid(parseInt(e.target.value));
+  };
+
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const handleChange = (currentNode, selectedNodes) => {
     setSelected(selectedNodes);
@@ -184,18 +268,20 @@ const Question = () => {
     formData.append("selectedModuleId", selectedModuleId);
     formData.append("parentModuleId", parentModuleId);
     formData.append("correct", JSON.stringify(correctOptions));
+    formData.append("courseid", courseid);
+    formData.append("moduleid", moduleid);
+    formData.append("submoduleid", submoduleid);
 
     if (questionType === "multiple_choice" || questionType === "true/false") {
-      formData.append("options", JSON.stringify(options)); // Append options
+      formData.append("options", JSON.stringify(options));
     }
 
     if (questionType === "description") {
-      formData.append("keywords", JSON.stringify(keywords)); // Append keywords for descriptive questions
+      formData.append("keywords", JSON.stringify(keywords));
     }
 
     if (questionType === "check") {
-      console.log(correctOptions);
-      formData.append("options", JSON.stringify(options)); // Append keywords for descriptive questions
+      formData.append("options", JSON.stringify(options));
     }
 
     if (questionType === "match_following") {
@@ -203,13 +289,15 @@ const Question = () => {
         leftItem: left,
         rightItem: matchRight[index],
       }));
-
-      formData.append("matches", JSON.stringify(matches)); // Append the matches
-
+      formData.append("matches", JSON.stringify(matches));
       formData.append("feedback", JSON.stringify(matchFeedback));
     }
 
-    console.log(questionType);
+    // Conditionally append the file if it exists
+    if (file) {
+      formData.append("file", file); // Attach file to form data
+    }
+
     console.log(formData);
 
     try {
@@ -217,8 +305,6 @@ const Question = () => {
         `${process.env.REACT_APP_API_URL}quiz/addquestion`,
         formData
       );
-
-      console.log(res.data);
 
       if (res.data.message === "quiz_added") {
         toast.success("Added successfully");
@@ -234,11 +320,12 @@ const Question = () => {
           { option: "", feedback: "" },
         ]);
         setShowFeedback([false, false, false, false]);
-        setKeywords([{ keyword: "", marks: "" , feedback: ""}]);
+        setKeywords([{ keyword: "", marks: "", feedback: "" }]);
         setUploadedQuestions([]);
         setSelected([]);
         setSelectedModuleId(null);
         setParentModuleId(null);
+        setFile(null); // Clear file input state
 
         // Reset the JoditEditor content
         if (editorRef.current) {
@@ -246,12 +333,67 @@ const Question = () => {
         }
       } else if (res.data.error === "db_error") {
         toast.error(res.data.error);
-        // Handle DB error
       }
     } catch (error) {
-      console.log(error);
-      // toast.error("Error submitting form", error);
-      // Handle error response
+      console.error("Error submitting form", error);
+      // toast.error("Error submitting form");
+    }
+  };
+
+  const FileSubmit = async () => {
+    // Create a new FormData object
+    const formData = new FormData();
+
+    // Append form fields to the FormData object
+    formData.append("courseid", courseid);
+    formData.append("moduleid", moduleid);
+    formData.append("submoduleid", submoduleid);
+
+    // Conditionally append the file if it exists
+    if (file) {
+      formData.append("file", file); // Attach file to form data
+    }
+
+    console.log(formData);
+
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}quiz/uploadquestions`,
+        formData
+      );
+      console.log(res);
+
+      if (res.data.message === "quiz_added") {
+        toast.success("Added successfully");
+
+        // Clear all input and box values by resetting state
+        setContent("");
+        setQuestionType("multiple choice");
+        setCorrectOption("");
+        setOptions([
+          { option: "", feedback: "" },
+          { option: "", feedback: "" },
+          { option: "", feedback: "" },
+          { option: "", feedback: "" },
+        ]);
+        setShowFeedback([false, false, false, false]);
+        setKeywords([{ keyword: "", marks: "", feedback: "" }]);
+        setUploadedQuestions([]);
+        setSelected([]);
+        setSelectedModuleId(null);
+        setParentModuleId(null);
+        setFile(null); // Clear file input state
+
+        // Reset the JoditEditor content
+        if (editorRef.current) {
+          editorRef.current.editor.setValue(""); // Clear the editor content
+        }
+      } else if (res.data.error === "db_error") {
+        toast.error(res.data.error);
+      }
+    } catch (error) {
+      console.error("Error submitting form", error);
+      toast.error("Error submitting form");
     }
   };
 
@@ -267,50 +409,132 @@ const Question = () => {
       <div className="modpart p-0 p-lg-5 rounded-3">
         <form>
           <div className="w-100">
-            <div className="form-group-inner">
-              <label className="labelcourse">Select the module</label>
-              <DropdownTreeSelect
-          data={moduleStructure}
-          onChange={handleChange}
-          className="bootstrap-demo"
-          texts={{ placeholder: "Select..." }}
-        />
+            <div className="form-group">
+              <label htmlFor="courseSelect">Select Course</label>
+              <select
+                id="courseSelect"
+                className="form-control"
+                value={courseid}
+                onChange={handleCourseChange}
+              >
+                <option value={0} disabled>
+                  Select a course
+                </option>
+                {courses.map((course) => (
+                  <option key={course.courseid} value={course.courseid}>
+                    {course.coursename}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {modules.length > 0 && (
+              <div className="form-group mt-3">
+                <label htmlFor="moduleSelect">Select Module</label>
+                <select
+                  id="moduleSelect"
+                  className="form-control"
+                  value={moduleid}
+                  onChange={handleModuleChange}
+                >
+                  <option value={0} disabled>
+                    Select a module
+                  </option>
+                  {modules.map((module) => (
+                    <option key={module.moduleid} value={module.moduleid}>
+                      {module.modulename}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {submodules.length > 0 && (
+              <div className="form-group mt-3">
+                <label htmlFor="submoduleSelect">Select Submodule</label>
+                <select
+                  id="submoduleSelect"
+                  className="form-control"
+                  value={submoduleid}
+                  onChange={handleSubmoduleChange}
+                >
+                  <option value={0} disabled>
+                    Select a submodule
+                  </option>
+                  {submodules.map((submodule) => (
+                    <option
+                      key={submodule.submodule_id}
+                      value={submodule.submodule_id}
+                    >
+                      {submodule.submodulename}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="form-group">
             <div className="form-group-inner w-100">
- <label htmlFor="questionType" className="labelcourse">Select Question Type</label>
- <select
-              id="questionType"
-              value={questionType}
-              onChange={handleQuestionTypeChange}
-              style={{ marginLeft: "10px" }}
-              className="w-100 fc1"
-            >
-              <option value="multiple choice">Multiple Choice</option>
-              <option value="description">Description</option>
-              {/* <option value="true/false">True/False</option> */}
-              <option value="match_following">match_following</option>
-              <option value="check">Multi Select</option>
-            </select>
+              <label htmlFor="questionType" className="labelcourse">
+                Select Question Type
+              </label>
+              <select
+                id="questionType"
+                value={questionType}
+                onChange={handleQuestionTypeChange}
+                style={{ marginLeft: "10px" }}
+                className="w-100 fc1"
+              >
+                <option value="multiple choice">Multiple Choice</option>
+                <option value="description">Description</option>
+                <option value="match_following">match_following</option>
+                <option value="check">Multi Select</option>
+              </select>
             </div>
           </div>
         </form>
-        
-<div className="d-flex justify-content-between py-2">
-<label className="labelcourse">Quiz Question</label>
-<Link  to={`/instructordashboard/${id}/updatequestion`}>
-<button
-            className="btn updatebtn"
-            style={{ color: "#ffa200", backgroundColor: "#001040" }}>
-           Update Question
-          </button></Link>
-          </div>
 
+        <div className="d-flex justify-content-between align-items-center py-2">
+          <label className="labelcourse">Quiz Question</label>
+          <div className="d-flex align-items-center">
+            {/* Upload Excel */}
+            <input
+              type="file"
+              accept=".xlsx, .xls, .csv"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+              id="excelFileInput"
+            />
+            <label htmlFor="excelFileInput" className="btn btn-light mx-2">
+              <FontAwesomeIcon icon={faFileExcel} color="#28a745" size="lg" />
+              <span className="ml-2">Upload Excel</span>
+            </label>
+            <button onClick={FileSubmit} className="btn btn-primary mx-2">
+              Upload
+            </button>
+
+            {/* Download Icon */}
+            <button
+              onClick={handleFileDownload}
+              className="btn btn-success mx-2"
+            >
+              <FontAwesomeIcon icon={faDownload} size="lg" />
+              <span className="ml-2"></span>
+            </button>
+          </div>
+          <Link to={`/instructordashboard/${id}/updatequestion`}>
+            <button
+              className="btn updatebtn"
+              style={{ color: "#ffa200", backgroundColor: "#001040" }}
+            >
+              Update Question
+            </button>
+          </Link>
+        </div>
 
         <JoditEditor
-        className="fc1"
+          className="fc1"
           ref={editorRef}
           value={content}
           config={{
@@ -328,7 +552,7 @@ const Question = () => {
                   Option {index + 1}:
                 </label>
                 <input
-                className="py-2"
+                  className="py-2"
                   type="text"
                   placeholder={`Option ${String.fromCharCode(65 + index)}`} // A, B, C, D, etc.
                   value={optionObj.option}
@@ -346,7 +570,7 @@ const Question = () => {
                   <div className="feedback" style={{ marginTop: "10px" }}>
                     <label>Feedback for Option {index + 1}:</label>
                     <JoditEditor
-                    className="fc1"
+                      className="fc1"
                       value={optionObj.feedback}
                       config={{
                         readonly: false,
@@ -451,7 +675,7 @@ const Question = () => {
                 <div style={{ marginTop: "10px" }}>
                   <label>Feedback for Pair {index + 1}:</label>
                   <JoditEditor
-                  className="fc1"
+                    className="fc1"
                     value={matchFeedback[index]?.feedback || ""} // Controlled value as a string
                     config={{ readonly: false, toolbar: true }}
                     onBlur={
@@ -493,7 +717,7 @@ const Question = () => {
                   <div className="feedback" style={{ marginTop: "10px" }}>
                     <label>Feedback for Option {index + 1}:</label>
                     <JoditEditor
-                    className="fc1"
+                      className="fc1"
                       value={optionObj.feedback}
                       config={{
                         readonly: false,
@@ -516,7 +740,8 @@ const Question = () => {
             </div>
 
             <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-              <label className="labelcourse">Select Correct Option</label> &nbsp;
+              <label className="labelcourse">Select Correct Option</label>{" "}
+              &nbsp;
               <select
                 value={correctOption}
                 onChange={(e) => setCorrectOption(e.target.value)}
@@ -563,7 +788,7 @@ const Question = () => {
                 <div style={{ marginTop: "10px" }}>
                   <label>Feedback:</label>
                   <JoditEditor
-                  className="fc1"
+                    className="fc1"
                     value={keyword.feedback}
                     config={{ readonly: false, toolbar: true }}
                     onBlur={(newContent) =>
@@ -574,7 +799,11 @@ const Question = () => {
 
                 <button
                   className="btn btn-danger btn-sm mt-2"
-                  onClick={() => removeKeyword(index)}> Remove</button>
+                  onClick={() => removeKeyword(index)}
+                >
+                  {" "}
+                  Remove
+                </button>
               </div>
             ))}
 
@@ -595,10 +824,6 @@ const Question = () => {
             Submit Question
           </button>
         </div>
-
-
-
-      
       </div>
     </div>
   );

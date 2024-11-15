@@ -31,24 +31,24 @@ function Sidebarinstructor({ isOpen, toggleSidebar }) {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}auth/protected`,
-          {
-            withCredentials: true,
-          }
-        );
-        console.log("Token is valid:", response.data);
-      } catch (error) {
-        console.error("Token verification error:", error);
-        navigate("/login");
-      }
-    };
+  // useEffect(() => {
+  //   const verifyToken = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_API_URL}auth/protected`,
+  //         {
+  //           withCredentials: true,
+  //         }
+  //       );
+  //       console.log("Token is valid:", response.data);
+  //     } catch (error) {
+  //       console.error("Token verification error:", error);
+  //       navigate("/login");
+  //     }
+  //   };
 
-    verifyToken();
-  }, [navigate]);
+  //   verifyToken();
+  // }, [navigate]);
 
   const handleLogout = async () => {
     try {
@@ -143,6 +143,22 @@ function Sidebarinstructor({ isOpen, toggleSidebar }) {
         <li>
           <Link
             style={{ textDecoration: "none" }}
+            // to={`/instructordashboard/${id}/coursemodule`}
+            to={`/instructordashboard/${id}/addsubmodule`}
+            className="d-flex"
+          >
+            <FontAwesomeIcon icon={faFileLines} className="mx-1 text-light mt-1" />
+            <motion.span
+              variants={linkVariants}
+              className="text ms-1 text-light"
+            >
+              Sub Module
+            </motion.span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            style={{ textDecoration: "none" }}
             to={`/instructordashboard/${id}/addpagecontent`}
             className="d-flex"
           >
@@ -191,6 +207,28 @@ function Sidebarinstructor({ isOpen, toggleSidebar }) {
             </motion.span>
           </Link>
         </li>
+        <li>
+          <Link
+            style={{ textDecoration: "none" }}
+            to={`/instructordashboard/${id}/test`}
+            className="d-flex"
+          >
+            <FontAwesomeIcon icon={faFileUpload} className="mx-1 text-light" />
+            <motion.span
+              variants={linkVariants}
+              className="text-white text-decoration-none ms-1"
+            >
+              Test creation
+            </motion.span>
+          </Link>
+        </li>
+
+
+
+
+
+
+
         <li>
           <Link
             style={{ textDecoration: "none" }}

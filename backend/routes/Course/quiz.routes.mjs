@@ -1,7 +1,9 @@
 import express from "express";
 import {
+  addBulkQuestion,
   addQuestion,
   createQuiz,
+  downloadSampleQuestionFormat,
   fetchQuizQuestions,
   getQuestion,
   getQuestionByModule,
@@ -15,6 +17,9 @@ import upload from "../../middleware/fileUpload.mjs";
 const router = express.Router();
 
 router.post("/addquestion", addQuestion);
+router.post("/uploadquestions", upload.single("file"), addBulkQuestion);
+router.get("/download-sample", downloadSampleQuestionFormat);
+
 router.get("/getquestion", getQuestion);
 router.get("/getmodulequestions/:moduleId", getQuestionByModule);
 router.post("/updatequestion", updateQuestionByModule);

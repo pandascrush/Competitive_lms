@@ -222,7 +222,7 @@ function Modulepage() {
     console.log(formData);
 
     axios
-      .post(`${process.env.REACT_APP_API_URL}course/addmodule, formData`, {
+      .post(`${process.env.REACT_APP_API_URL}course/addmodule`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -267,23 +267,20 @@ function Modulepage() {
         </div> */}
         <ToastContainer />
         <div>
-       
           <form onSubmit={handleSubmit}>
-<div className="w-100">
-  <div className="form-group-inner p-0 m-0 w-100 border-0">
-    <label className="labelcourse">Select the Course</label>
-    <DropdownTreeSelect
-          data={courses}
-          onChange={handleChange}
-          className="bootstrap-demo fc1 custom-dropdown border-0  rounded-2"
-          texts={{ placeholder: "Select..." }}
-          value={selectedNode ? [selectedNode] : []}
-        />
-        <ToastContainer />
-  </div>
-</div>
-
-
+            <div className="w-100">
+              <div className="form-group-inner p-0 m-0 w-100 border-0">
+                <label className="labelcourse">Select the Course</label>
+                <DropdownTreeSelect
+                  data={courses}
+                  onChange={handleChange}
+                  className="bootstrap-demo fc1 custom-dropdown border-0  rounded-2"
+                  texts={{ placeholder: "Select..." }}
+                  value={selectedNode ? [selectedNode] : []}
+                />
+                <ToastContainer />
+              </div>
+            </div>
 
             {/* <div className="form-group">
               <div className="form-group-inner">
@@ -302,50 +299,54 @@ function Modulepage() {
             ))}
               </div>
             </div> */}
-           
 
-           <div className="form-group">
-  <div className="form-group-inner">
-    <label className="labelcourse">Add New Module</label>
-    {textareas.map((textarea, index) => (
-      <div key={index} className="my-2 d-flex align-items-center w-100">
-        <input
-          type="text"
-          value={textarea}
-          onChange={(e) => handleTextareaChange(index, e.target.value)}
-          className="form-control fc1" 
-          placeholder={`Enter Module Name ${index + 1}`} />
-          <Link to={`/instructordashboard/${id}/updatemodule`}>
-          <i
-          className="fas fa-pencil-alt ms-2"
-          style={{
-            cursor: 'pointer',  // Optional: make it look clickable
-            color: '#001040'       // Optional: adjust color as needed
-          }}
-        />
-          </Link>
-     
-      </div>
-    ))}
-  </div>
-</div>    
             <div className="form-group">
               <div className="form-group-inner">
-              <label htmlFor="moduleImage" className="labelcourse">
-                Module Image
-              </label>
-              <input
-                type="file"
-                className="form-control fc1"
-                id="moduleImage"
-                onChange={handleFileChange}/>
+                <label className="labelcourse">Add New Module</label>
+                {textareas.map((textarea, index) => (
+                  <div
+                    key={index}
+                    className="my-2 d-flex align-items-center w-100"
+                  >
+                    <input
+                      type="text"
+                      value={textarea}
+                      onChange={(e) =>
+                        handleTextareaChange(index, e.target.value)
+                      }
+                      className="form-control fc1"
+                      placeholder={`Enter Module Name ${index + 1}`}
+                    />
+                    <Link to={`/instructordashboard/${id}/updatemodule`}>
+                      <i
+                        className="fas fa-pencil-alt ms-2"
+                        style={{
+                          cursor: "pointer", // Optional: make it look clickable
+                          color: "#001040", // Optional: adjust color as needed
+                        }}
+                      />
+                    </Link>
+                  </div>
+                ))}
               </div>
-             
+            </div>
+            <div className="form-group">
+              <div className="form-group-inner">
+                <label htmlFor="moduleImage" className="labelcourse">
+                  Module Image
+                </label>
+                <input
+                  type="file"
+                  className="form-control fc1"
+                  id="moduleImage"
+                  onChange={handleFileChange}
+                />
+              </div>
             </div>
             <div className="d-flex justify-content-end">
-            <button type="submit" className="formbtn my-2 updatebtn">
-              Submit
-            </button>
+              <button type="submit" className="formbtn my-2 updatebtn">
+                Submit
+              </button>
             </div>
           </form>
         </div>

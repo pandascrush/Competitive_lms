@@ -1,7 +1,10 @@
 import db from "../../config/db.config.mjs";
 import transporter from "../../config/email.config.mjs";
 import path from "path";
+import XLSX from "xlsx";
+import csvParser from "csv-parser";
 import upload from "../../middleware/fileUpload.mjs";
+import fs from "fs";
 
 export const getQuestion = (req, res) => {
   const sql = `select * from quiz_text`;
@@ -15,26 +18,13 @@ export const getQuestion = (req, res) => {
 };
 
 export const addQuestion = (req, res) => {
-  upload.none()(req, res, (err) => {
+  upload.single("file")(req, res, (err) => {
     if (err) {
-      console.error("Error parsing form data", err);
-      return res.json({ error: "form_data_error" });
+      console.error("File upload error:", err);
+      return res.json({ error: "file_upload_error" });
     }
 
     const {
-      content, // Question content
-      options, // For multiple_choice/true_false
-      selectedModuleId, // Module id
-      parentModuleId, // Course id
-      correctOption, // Correct answer for MCQ/True-False
-      questionType, // Type of question
-      keywords, // For descriptive type
-      matches, // For match-the-following pairs
-      correct,
-      feedback,
-    } = req.body;
-
-    console.log(
       content,
       options,
       selectedModuleId,
@@ -43,98 +33,91 @@ export const addQuestion = (req, res) => {
       questionType,
       keywords,
       matches,
-      feedback
-    );
+      correct,
+      courseid,
+      moduleid,
+      submoduleid,
+      feedback,
+    } = req.body;
 
+    // Check if an Excel file is uploaded
+    // Handle manual question insertion based on `questionType`
     let query;
     let queryParams;
 
-    // Insert logic for multiple choice or true/false questions
     if (questionType === "multiple_choice" || questionType === "true/false") {
       query = `
-        INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
+          INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type, submoduleid)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
       queryParams = [
         content,
-        JSON.stringify(JSON.parse(options)), // Parse the options sent as JSON string
-        correctOption, // Correct option
-        parentModuleId, // Course ID
-        selectedModuleId, // Module ID
-        questionType, // Question type
+        JSON.stringify(JSON.parse(options)),
+        correctOption,
+        courseid,
+        moduleid,
+        questionType,
+        submoduleid,
       ];
     } else if (questionType === "check") {
       query = `
-        INSERT INTO quiz_text (text, \`option\`, check_data, courseid, moduleid, question_type)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
+          INSERT INTO quiz_text (text, \`option\`, check_data, courseid, moduleid, question_type)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `;
       queryParams = [
         content,
-        JSON.stringify(JSON.parse(options)), // Parse the options sent as JSON string
+        JSON.stringify(JSON.parse(options)),
         correct,
-        parentModuleId, // Course ID
-        selectedModuleId, // Module ID
-        questionType, // Question type
+        parentModuleId,
+        selectedModuleId,
+        questionType,
       ];
-    }
-    // Insert logic for descriptive questions
-    else if (questionType === "description") {
+    } else if (questionType === "description") {
       query = `
-        INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type)
-        VALUES (?, ?, NULL, ?, ?, ?)
-      `;
+          INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type)
+          VALUES (?, ?, NULL, ?, ?, ?)
+        `;
       queryParams = [
         content,
-        JSON.stringify(JSON.parse(keywords)), // Parse the keywords sent as JSON string
+        JSON.stringify(JSON.parse(keywords)),
         parentModuleId,
         selectedModuleId,
         "descriptive",
       ];
-    }
-    // Insert logic for match-the-following questions
-    else if (questionType === "match_following") {
+    } else if (questionType === "match_following") {
       query = `
-        INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type,feedback)
-        VALUES (?, ?, NULL, ?, ?, ?,?)
-      `;
+          INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type, feedback)
+          VALUES (?, ?, NULL, ?, ?, ?, ?)
+        `;
       queryParams = [
         content,
-        JSON.stringify([]), // Empty array for options since matches will be inserted separately
+        JSON.stringify([]),
         parentModuleId,
         selectedModuleId,
         "match",
-        feedback
+        feedback,
       ];
     } else {
       return res.json({ error: "invalid_question_type" });
     }
 
-    // Execute query to insert the main question
+    // Insert the single question manually
     db.query(query, queryParams, (err, results) => {
       if (err) {
-        console.error(err);
+        console.error("DB error:", err);
         return res.json({ error: "db_error" });
       }
 
       const quizTextId = results.insertId;
 
-      // Handle match-the-following insertion separately
       if (questionType === "match_following" && matches) {
-        // Parse the matches if it's a string
-        let parsedMatches = [];
-        try {
-          parsedMatches = JSON.parse(matches);
-        } catch (parseErr) {
-          return res.json({ error: "invalid_matches_format" });
-        }
-
-        // Insert each match pair
+        const parsedMatches = JSON.parse(matches);
         const matchPromises = parsedMatches.map(({ leftItem, rightItem }) => {
           return new Promise((resolve, reject) => {
             const insertLeftQuery = `
-              INSERT INTO match_subquestions (quiz_text_id, subquestion_text)
-              VALUES (?, ?)
-            `;
+                INSERT INTO match_subquestions (quiz_text_id, subquestion_text)
+                VALUES (?, ?)
+              `;
             db.query(
               insertLeftQuery,
               [quizTextId, leftItem],
@@ -142,11 +125,10 @@ export const addQuestion = (req, res) => {
                 if (err) return reject(err);
 
                 const subquestionId = subResult.insertId;
-
                 const insertRightQuery = `
-                INSERT INTO match_options (subquestion_id, option_text, is_correct)
-                VALUES (?, ?, ?)
-              `;
+                  INSERT INTO match_options (subquestion_id, option_text, is_correct)
+                  VALUES (?, ?, ?)
+                `;
                 db.query(
                   insertRightQuery,
                   [subquestionId, rightItem, true],
@@ -160,20 +142,110 @@ export const addQuestion = (req, res) => {
           });
         });
 
-        // Wait for all promises to complete before sending a response
         Promise.all(matchPromises)
-          .then(() => {
-            res.json({ message: "quiz_added", id: quizTextId });
-          })
+          .then(() => res.json({ message: "quiz_added", id: quizTextId }))
           .catch((err) => {
-            console.error(err);
+            console.error("DB error:", err);
             res.json({ error: "db_error" });
           });
       } else {
-        // For other question types, return success response
         res.json({ message: "quiz_added", id: quizTextId });
       }
     });
+  });
+};
+
+export const addBulkQuestion = (req, res) => {
+  console.log("Bulk Questions");
+
+  const { courseid, moduleid, submoduleid } = req.body;
+
+  if (req.file) {
+    const rows = [];
+
+    // Reading CSV file from the disk path
+    fs.createReadStream(req.file.path)
+      .pipe(csvParser())
+      .on("data", (row) => {
+        rows.push(row);
+      })
+      .on("end", () => {
+        // Insert each row into the database
+        const insertPromises = rows.map((row) => {
+          const { content, options, correctAnswer } = row;
+
+          console.log(content, options, correctAnswer);
+
+          let parsedOptions;
+          try {
+            // Try to parse options as JSON
+            parsedOptions = JSON.parse(options);
+          } catch (e) {
+            // If parsing fails, assume it's a comma-separated string
+            parsedOptions = options ? options.split(",") : [];
+          }
+
+          const query = `
+              INSERT INTO quiz_text (text, \`option\`, correct_answer, courseid, moduleid, question_type, submoduleid)
+              VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+          const queryParams = [
+            content,
+            JSON.stringify(parsedOptions), // Store options as JSON array
+            correctAnswer,
+            courseid,
+            moduleid,
+            "multiple_choice", // Assuming multiple_choice for bulk upload
+            submoduleid,
+          ];
+
+          return new Promise((resolve, reject) => {
+            db.query(query, queryParams, (err, results) => {
+              if (err) {
+                console.error("DB error:", err);
+                return reject(err);
+              }
+              resolve(results.insertId);
+            });
+          });
+        });
+
+        Promise.all(insertPromises)
+          .then((insertedIds) =>
+            res.json({
+              message: "questions_added",
+              ids: insertedIds.filter(Boolean),
+            })
+          )
+          .catch((err) => {
+            console.error("Error processing rows:", err);
+            res.json({ error: "db_error" });
+          });
+      })
+      .on("error", (error) => {
+        console.error("Error reading CSV file:", error);
+        res.json({ error: "csv_parse_error" });
+      });
+  } else {
+    res.status(400).json({ error: "No file uploaded" });
+  }
+};
+
+export const downloadSampleQuestionFormat = (req, res) => {
+  const __dirname = path.resolve()
+  const filePath = path.join(__dirname, "/uploads/Sample_Question_Format.csv");
+
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: "File not found" });
+  }
+
+  // Set response headers and send the file
+  res.download(filePath, "Sample_Question_Format.csv", (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(500).json({ error: "Could not download file" });
+    }
   });
 };
 

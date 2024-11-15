@@ -71,6 +71,8 @@ import MapComponent from "./Component/Drken/Mapcomponent/Mapcomponent";
 import CourseList from "./Component/Admin/CourseList/CourseList";
 import ForgotPassword from "./Component/Landingpage/ForgotPassword/ForgotPassword";
 import ResetPassword from "./Component/Landingpage/ResetPassword/ResetPassword";
+import SubModule from "./Component/Instructor/SubModule/SubModule";
+import Testcreation from "./Component/Instructor/Question/Testcreation/Testcreation";
 
 // import RichTextEditor from './Component/Instructor/Richtexteditor/Richtexteditor';
 
@@ -134,25 +136,22 @@ function App() {
 
           <Route
             path="/instructordashboard/:id*"
-            element={<Dashboardinstructor />}>
+            element={<Dashboardinstructor />}
+          >
             <Route path="courselist" element={<Courselist />} />
-            <Route path="addpagecontent" element={[ <Coursecontent />]}/>
-            <Route path="updatepagecontent" element={[ <CoursecontentUpdate />]}/>
+            <Route path="addpagecontent" element={[<Coursecontent />]} />
+            <Route
+              path="updatepagecontent"
+              element={[<CoursecontentUpdate />]}
+            />
+            <Route path="test" element={<Testcreation/>}/>
             {/* <Route path="coursemodule" element={<Module />} /> */}
             <Route path="addmodule" element={[<Modulepage />]} />
-            <Route
-              path="updatemodule"
-              element={[<ModuleUpdate />]}
-            />
+            <Route path="addsubmodule" element={<SubModule />} />
+            <Route path="updatemodule" element={[<ModuleUpdate />]} />
             <Route path="quilltxt" element={<QuestionPage />} />
-            <Route
-              path="addquestion"
-              element={<Question />}
-            />
-            <Route
-              path="updatequestion"
-              element={ <QuestionUpdate />}
-            />
+            <Route path="addquestion" element={<Question />} />
+            <Route path="updatequestion" element={<QuestionUpdate />} />
             <Route path="questionbank" element={<CategoryQuizList />} />
             <Route path="category" element={<AddCategory />} />
             <Route path="coursecreation" element={<AddCourse />} />
@@ -187,7 +186,10 @@ function App() {
           <Route path="/instructor" element={<Instructors />} />
           <Route path="/courseoverview" element={<Overview />} />
           <Route path="/courseview" element={<Courseview />} />
-          <Route path="/allcourselist/:id" element={[<DrmenubarUser />, <Availablecourses />]} />
+          <Route
+            path="/allcourselist/:id"
+            element={[<DrmenubarUser />, <Availablecourses />]}
+          />
           {/* <Route path="/quizquestions" element={<QuestionDisplay />} /> */}
           <Route
             path="/ken/:course/:module/:id"
@@ -202,8 +204,14 @@ function App() {
             path="/user/:id/profile"
             element={[<DrmenubarUser />, <DashBoardProfile />]}
           />
-          <Route path="/user/:id/message" element={[<DrmenubarUser />, <DashBoardMessage />]} />
-          <Route path="/user/:id/payment" element={[<DrmenubarUser />, <DashBoardPayment />]} />
+          <Route
+            path="/user/:id/message"
+            element={[<DrmenubarUser />, <DashBoardMessage />]}
+          />
+          <Route
+            path="/user/:id/payment"
+            element={[<DrmenubarUser />, <DashBoardPayment />]}
+          />
           <Route path="/user/:id/editprofile" element={<Edit />} />
           <Route path="/mp" element={<MapComponent />} />
         </Routes>

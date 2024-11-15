@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
--- Host: localhost    Database: lms
+-- Host: localhost    Database: competitive_lms
 -- ------------------------------------------------------
 -- Server version	8.0.35
 
@@ -41,6 +41,15 @@ CREATE TABLE `activity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `activity`
+--
+
+LOCK TABLES `activity` WRITE;
+/*!40000 ALTER TABLE `activity` DISABLE KEYS */;
+/*!40000 ALTER TABLE `activity` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `auth`
 --
 
@@ -64,6 +73,15 @@ CREATE TABLE `auth` (
   CONSTRAINT `fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `auth`
+--
+
+LOCK TABLES `auth` WRITE;
+/*!40000 ALTER TABLE `auth` DISABLE KEYS */;
+/*!40000 ALTER TABLE `auth` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `business_register`
@@ -93,6 +111,15 @@ CREATE TABLE `business_register` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `business_register`
+--
+
+LOCK TABLES `business_register` WRITE;
+/*!40000 ALTER TABLE `business_register` DISABLE KEYS */;
+/*!40000 ALTER TABLE `business_register` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `checkout_details`
 --
 
@@ -115,6 +142,15 @@ CREATE TABLE `checkout_details` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `checkout_details`
+--
+
+LOCK TABLES `checkout_details` WRITE;
+/*!40000 ALTER TABLE `checkout_details` DISABLE KEYS */;
+/*!40000 ALTER TABLE `checkout_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `context`
 --
 
@@ -131,8 +167,18 @@ CREATE TABLE `context` (
   PRIMARY KEY (`context_id`),
   KEY `fk_contextlevel` (`contextlevel`),
   CONSTRAINT `fk_contextlevel` FOREIGN KEY (`contextlevel`) REFERENCES `context_level_description` (`contextlevel`)
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `context`
+--
+
+LOCK TABLES `context` WRITE;
+/*!40000 ALTER TABLE `context` DISABLE KEYS */;
+INSERT INTO `context` VALUES (100,3,5,'2/5',NULL,'2024-11-14 05:34:28'),(101,5,21,'2/5','0/1','2024-11-14 05:35:27'),(102,8,1,'2/5/21','0/1','2024-11-14 07:45:54'),(104,8,3,'2/5/21','0/2','2024-11-14 07:52:55'),(105,3,6,'3/6',NULL,'2024-11-14 08:01:06'),(106,5,22,'3/6','0/1','2024-11-14 08:02:19'),(107,8,4,'3/6/22','0/1','2024-11-14 08:04:47');
+/*!40000 ALTER TABLE `context` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `context_level_description`
@@ -145,8 +191,18 @@ CREATE TABLE `context_level_description` (
   `contextlevel` int NOT NULL AUTO_INCREMENT,
   `contextlevel_desc` varchar(255) NOT NULL,
   PRIMARY KEY (`contextlevel`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `context_level_description`
+--
+
+LOCK TABLES `context_level_description` WRITE;
+/*!40000 ALTER TABLE `context_level_description` DISABLE KEYS */;
+INSERT INTO `context_level_description` VALUES (1,'student'),(2,'user'),(3,'course'),(4,'quiz'),(5,'module'),(6,'course_content'),(7,'company'),(8,'submodule');
+/*!40000 ALTER TABLE `context_level_description` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `course_category`
@@ -159,8 +215,18 @@ CREATE TABLE `course_category` (
   `course_category_id` int NOT NULL AUTO_INCREMENT,
   `course_category_name` varchar(255) NOT NULL,
   PRIMARY KEY (`course_category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `course_category`
+--
+
+LOCK TABLES `course_category` WRITE;
+/*!40000 ALTER TABLE `course_category` DISABLE KEYS */;
+INSERT INTO `course_category` VALUES (2,'TNPSC'),(3,'UPSC');
+/*!40000 ALTER TABLE `course_category` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `course_difficulty_level`
@@ -175,6 +241,15 @@ CREATE TABLE `course_difficulty_level` (
   PRIMARY KEY (`difficulty_level_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `course_difficulty_level`
+--
+
+LOCK TABLES `course_difficulty_level` WRITE;
+/*!40000 ALTER TABLE `course_difficulty_level` DISABLE KEYS */;
+/*!40000 ALTER TABLE `course_difficulty_level` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `courses`
@@ -200,8 +275,18 @@ CREATE TABLE `courses` (
   KEY `fk_difficulty_level` (`difficulty_level_id`),
   CONSTRAINT `fk_course_category` FOREIGN KEY (`course_category_id`) REFERENCES `course_category` (`course_category_id`),
   CONSTRAINT `fk_difficulty_level` FOREIGN KEY (`difficulty_level_id`) REFERENCES `course_difficulty_level` (`difficulty_level_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `courses`
+--
+
+LOCK TABLES `courses` WRITE;
+/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
+INSERT INTO `courses` VALUES (5,'GROUP 1','2024-11-14 05:34:28','group1',2,'2024-11-14','2024-11-30','\\uploads\\courseImage-1731562468107-602539038.jpg','Group 1 exam',NULL,NULL),(6,'UPSC','2024-11-14 08:01:06','upsc',3,'2024-11-14','2024-11-30','\\uploads\\courseImage-1731571266268-274770380.jpg','UPSC Exam Test',NULL,NULL);
+/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `department`
@@ -216,6 +301,15 @@ CREATE TABLE `department` (
   PRIMARY KEY (`dept_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `department`
+--
+
+LOCK TABLES `department` WRITE;
+/*!40000 ALTER TABLE `department` DISABLE KEYS */;
+/*!40000 ALTER TABLE `department` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `invite_learners`
@@ -235,6 +329,15 @@ CREATE TABLE `invite_learners` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `invite_learners`
+--
+
+LOCK TABLES `invite_learners` WRITE;
+/*!40000 ALTER TABLE `invite_learners` DISABLE KEYS */;
+/*!40000 ALTER TABLE `invite_learners` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `license`
 --
 
@@ -250,6 +353,15 @@ CREATE TABLE `license` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `license`
+--
+
+LOCK TABLES `license` WRITE;
+/*!40000 ALTER TABLE `license` DISABLE KEYS */;
+/*!40000 ALTER TABLE `license` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `match_options`
@@ -270,6 +382,15 @@ CREATE TABLE `match_options` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `match_options`
+--
+
+LOCK TABLES `match_options` WRITE;
+/*!40000 ALTER TABLE `match_options` DISABLE KEYS */;
+/*!40000 ALTER TABLE `match_options` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `match_subquestions`
 --
 
@@ -285,6 +406,15 @@ CREATE TABLE `match_subquestions` (
   CONSTRAINT `match_subquestions_ibfk_1` FOREIGN KEY (`quiz_text_id`) REFERENCES `quiz_text` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `match_subquestions`
+--
+
+LOCK TABLES `match_subquestions` WRITE;
+/*!40000 ALTER TABLE `match_subquestions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `match_subquestions` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `modules`
@@ -303,8 +433,18 @@ CREATE TABLE `modules` (
   `module_enable` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`moduleid`),
   UNIQUE KEY `moduleid` (`moduleid`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `modules`
+--
+
+LOCK TABLES `modules` WRITE;
+/*!40000 ALTER TABLE `modules` DISABLE KEYS */;
+INSERT INTO `modules` VALUES (21,'Aptitude',NULL,'2024-11-14 05:35:27',5,'\\uploads\\moduleImage-1731656665944-57602827.jpg',1),(22,'Reasoning',NULL,'2024-11-14 08:02:19',6,'\\uploads\\moduleImage-1731571339712-430629744.png',1);
+/*!40000 ALTER TABLE `modules` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `offlinetransaction`
@@ -326,6 +466,15 @@ CREATE TABLE `offlinetransaction` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `offlinetransaction`
+--
+
+LOCK TABLES `offlinetransaction` WRITE;
+/*!40000 ALTER TABLE `offlinetransaction` DISABLE KEYS */;
+/*!40000 ALTER TABLE `offlinetransaction` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `pages`
@@ -351,6 +500,15 @@ CREATE TABLE `pages` (
   CONSTRAINT `fk_pages_context` FOREIGN KEY (`context_id`) REFERENCES `context` (`context_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pages`
+--
+
+LOCK TABLES `pages` WRITE;
+/*!40000 ALTER TABLE `pages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pages` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `quiz`
@@ -388,6 +546,15 @@ CREATE TABLE `quiz` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `quiz`
+--
+
+LOCK TABLES `quiz` WRITE;
+/*!40000 ALTER TABLE `quiz` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quiz` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `quiz_attempt`
 --
 
@@ -411,6 +578,15 @@ CREATE TABLE `quiz_attempt` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `quiz_attempt`
+--
+
+LOCK TABLES `quiz_attempt` WRITE;
+/*!40000 ALTER TABLE `quiz_attempt` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quiz_attempt` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `quiz_text`
 --
 
@@ -429,13 +605,24 @@ CREATE TABLE `quiz_text` (
   `courseid` int DEFAULT NULL,
   `check_data` json DEFAULT NULL,
   `feedback` json DEFAULT NULL,
+  `submoduleid` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_quiztext_course` (`courseid`),
   KEY `fk_quiztext_module` (`moduleid`),
   CONSTRAINT `fk_quiztext_course` FOREIGN KEY (`courseid`) REFERENCES `courses` (`courseid`),
   CONSTRAINT `fk_quiztext_module` FOREIGN KEY (`moduleid`) REFERENCES `modules` (`moduleid`)
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quiz_text`
+--
+
+LOCK TABLES `quiz_text` WRITE;
+/*!40000 ALTER TABLE `quiz_text` DISABLE KEYS */;
+INSERT INTO `quiz_text` VALUES (109,'<p>A train running at the speed of 60 km/hr crosses a pole in 9 seconds. What is the length of the train?</p><p><br></p>','[{\"option\": \"120 metres\", \"feedback\": \"\"}, {\"option\": \"180 metres\", \"feedback\": \"\"}, {\"option\": \"324 metres\", \"feedback\": \"\"}, {\"option\": \"150 metres\", \"feedback\": \"\"}]','2024-11-15 04:29:56','150 metres','multiple_choice',NULL,21,5,NULL,NULL,1),(110,'<p>The length of the bridge, which a train 130 metres long and travelling at 45 km/hr can cross in 30 seconds, is:</p>','[{\"option\": \"200m\", \"feedback\": \"\"}, {\"option\": \"225m\", \"feedback\": \"\"}, {\"option\": \"245m\", \"feedback\": \"\"}, {\"option\": \"250m\", \"feedback\": \"\"}]','2024-11-15 07:24:38','245m','multiple_choice',NULL,21,5,NULL,NULL,1),(111,'<div class=\"bix-td-qtxt table-responsive w-100\">A\r\n train passes a station platform in 36 seconds and a man standing on the\r\n platform in 20 seconds. If the speed of the train is 54 km/hr, what is \r\nthe length of the platform?\r\n</div>','[{\"option\": \"120 m\", \"feedback\": \"\"}, {\"option\": \"240 m\", \"feedback\": \"\"}, {\"option\": \"300 m\", \"feedback\": \"\"}, {\"option\": \"None of these\", \"feedback\": \"\"}]','2024-11-15 07:27:09','240 m','multiple_choice',NULL,21,5,NULL,NULL,1),(112,'A train 125 m long passes a man, running at 5 km/hr in the same direction in which the train is going, in 10 seconds. The speed of the train is:','[\"[{\\\"option\\\": \\\"45 km/hr\\\"\", \" \\\"feedback\\\": \\\"\\\"}\", \" {\\\"option\\\": \\\"50 km/hr\\\"\", \" \\\"feedback\\\": \\\"\\\"}\", \" {\\\"option\\\": \\\"54 km/hr\\\"\", \" \\\"feedback\\\": \\\"\\\"}\", \" {\\\"option\\\": \\\"55 km/hr\\\"\", \" \\\"feedback\\\": \\\"\\\"}]\"]','2024-11-15 07:55:33','50 km/hr','multiple_choice',NULL,21,5,NULL,NULL,1),(113,'A train 240 m long passes a pole in 24 seconds. How long will it take to pass a platform 650 m long?','[{\"option\": \"65 sec\", \"feedback\": \"\"}, {\"option\": \"89 sec\", \"feedback\": \"\"}, {\"option\": \"100 sec\", \"feedback\": \"\"}, {\"option\": \"150 sec\", \"feedback\": \"\"}]','2024-11-15 10:14:49','89 sec','multiple_choice',NULL,21,5,NULL,NULL,1);
+/*!40000 ALTER TABLE `quiz_text` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `quiz_type`
@@ -452,6 +639,15 @@ CREATE TABLE `quiz_type` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `quiz_type`
+--
+
+LOCK TABLES `quiz_type` WRITE;
+/*!40000 ALTER TABLE `quiz_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quiz_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `roles`
 --
 
@@ -465,6 +661,15 @@ CREATE TABLE `roles` (
   UNIQUE KEY `role_name` (`role_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `roles`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `staff`
@@ -492,6 +697,15 @@ CREATE TABLE `staff` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `staff`
+--
+
+LOCK TABLES `staff` WRITE;
+/*!40000 ALTER TABLE `staff` DISABLE KEYS */;
+/*!40000 ALTER TABLE `staff` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `standardlog`
 --
 
@@ -508,6 +722,15 @@ CREATE TABLE `standardlog` (
   UNIQUE KEY `log_id` (`log_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=951 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `standardlog`
+--
+
+LOCK TABLES `standardlog` WRITE;
+/*!40000 ALTER TABLE `standardlog` DISABLE KEYS */;
+/*!40000 ALTER TABLE `standardlog` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `student`
@@ -536,6 +759,43 @@ CREATE TABLE `student` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `student`
+--
+
+LOCK TABLES `student` WRITE;
+/*!40000 ALTER TABLE `student` DISABLE KEYS */;
+/*!40000 ALTER TABLE `student` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `submodule`
+--
+
+DROP TABLE IF EXISTS `submodule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `submodule` (
+  `submodule_id` int NOT NULL AUTO_INCREMENT,
+  `submodulename` varchar(255) NOT NULL,
+  `courseid` int NOT NULL,
+  `moduleid` int NOT NULL,
+  `context_id` int DEFAULT NULL,
+  `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`submodule_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `submodule`
+--
+
+LOCK TABLES `submodule` WRITE;
+/*!40000 ALTER TABLE `submodule` DISABLE KEYS */;
+INSERT INTO `submodule` VALUES (1,'Train',5,21,102,'2024-11-14 07:45:54'),(3,'Boats & Streams',5,21,104,'2024-11-14 07:52:55'),(4,'Verbal',6,22,107,'2024-11-14 08:04:47');
+/*!40000 ALTER TABLE `submodule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `type_of_section`
 --
 
@@ -548,6 +808,15 @@ CREATE TABLE `type_of_section` (
   PRIMARY KEY (`type_of_section_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `type_of_section`
+--
+
+LOCK TABLES `type_of_section` WRITE;
+/*!40000 ALTER TABLE `type_of_section` DISABLE KEYS */;
+/*!40000 ALTER TABLE `type_of_section` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `user`
@@ -578,6 +847,15 @@ CREATE TABLE `user` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user_course_completion`
 --
 
@@ -592,6 +870,15 @@ CREATE TABLE `user_course_completion` (
   PRIMARY KEY (`completion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_course_completion`
+--
+
+LOCK TABLES `user_course_completion` WRITE;
+/*!40000 ALTER TABLE `user_course_completion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_course_completion` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `user_enrollment`
@@ -613,6 +900,15 @@ CREATE TABLE `user_enrollment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `user_enrollment`
+--
+
+LOCK TABLES `user_enrollment` WRITE;
+/*!40000 ALTER TABLE `user_enrollment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_enrollment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user_lastaccess`
 --
 
@@ -627,6 +923,15 @@ CREATE TABLE `user_lastaccess` (
   PRIMARY KEY (`access_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_lastaccess`
+--
+
+LOCK TABLES `user_lastaccess` WRITE;
+/*!40000 ALTER TABLE `user_lastaccess` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_lastaccess` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `user_msg_compose`
@@ -647,6 +952,15 @@ CREATE TABLE `user_msg_compose` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `user_msg_compose`
+--
+
+LOCK TABLES `user_msg_compose` WRITE;
+/*!40000 ALTER TABLE `user_msg_compose` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_msg_compose` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user_track`
 --
 
@@ -661,6 +975,15 @@ CREATE TABLE `user_track` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_track`
+--
+
+LOCK TABLES `user_track` WRITE;
+/*!40000 ALTER TABLE `user_track` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_track` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -671,4 +994,4 @@ CREATE TABLE `user_track` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-13 13:37:23
+-- Dump completed on 2024-11-15 17:59:28
